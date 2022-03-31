@@ -10,12 +10,12 @@ package multiqueuescheduler;
  * @author Omar Mohamed Adel Elsabaawy
  */
 public class SRTF {
-    private process [] processes;
-    private double [] waiting_time;
-    private int quantamSize;
+    private final process [] processes;
+    private final double [] waiting_time;
+    private final int quantamSize;
     private double average_time;
     private double time;
-    private list queue;
+    private final list queue;
     private int index = 1;
 
     public SRTF(process[] processes, int quantamSize) {
@@ -34,15 +34,14 @@ public class SRTF {
                 time += quantamSize;
                 queue.head.process.brust_time -= quantamSize;
                 if (index != processes.length) {
-                    for (int i = 1; i < processes.length; i++) {
-                        if (processes[i].arrival_time < quantamSize) {
+                    for (int i = index; i < processes.length; i++) {
+                        if (processes[i].arrival_time <= time) {
                             queue.sortedInsert(new Node(processes[i]));
                             index++;
                         }else{
                             break;
                         }
                     }
-
                     process reEnterProcess = queue.head.process;
                     queue.deleteFront();
                     queue.sortedInsert(new Node(reEnterProcess));
@@ -52,8 +51,8 @@ public class SRTF {
                 queue.head.process.complete_time = time;
                 queue.deleteFront();
                 if (index != processes.length) {
-                    for (int i = 1; i < processes.length; i++) {
-                        if (processes[i].arrival_time < quantamSize) {
+                    for (int i = index; i < processes.length; i++) {
+                        if (processes[i].arrival_time <= time) {
                             queue.sortedInsert(new Node(processes[i]));
                             index++;
                         }else{
@@ -65,7 +64,7 @@ public class SRTF {
         }
         int i = 0;
         for(process process : processes){
-            waiting_time[i] = process.complete_time - process.arrival_time - process.brust_time;
+            waiting_time[i] = process.complete_time - process.arrival_time - process.bt;
             average_time += waiting_time[i++];
         }
         average_time /= waiting_time.length;
